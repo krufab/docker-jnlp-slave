@@ -58,12 +58,18 @@ function teardown () {
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 }
 
-@test "[${JDK} ${FLAVOR}] image starts jenkins-agent correctly" {
+@test "[${JDK} ${FLAVOR}] image starts jenkins-agent correctly (slow test)" {
+  #  Spin off a helper image which contains netcat
   docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh
 
+  # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
   docker run -d --link netcat-helper --name "${AGENT_CONTAINER}" "${AGENT_IMAGE}" -url http://netcat-helper:5000 aaa bbb
 
-  run docker exec netcat-helper /bin/sh -c "timeout 10s nc -l 5000"
+  # Launch the netcat utility, listening at port 5000 for 30 sec
+  # bats will capture the output from netcat and compare the first line
+  # of the header of the first HTTO request request
+  # with the expected one
+  run docker exec netcat-helper /bin/sh -c "timeout 30s nc -l 5000"
 
   # The GET request ends with a '\r'
   [ $'GET /tcpSlaveAgentListener/ HTTP/1.1\r' = "${lines[0]}" ]
@@ -72,9 +78,9 @@ function teardown () {
 @test "[${JDK} ${FLAVOR}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
-	local ARG_TEST_VERSION
+  local ARG_TEST_VERSION
   local TEST_VERSION="3.36"
-	local TEST_USER="root"
+  local TEST_USER="root"
 
 	if [[ "${FLAVOR}" = "debian" ]]
   then
