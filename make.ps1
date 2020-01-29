@@ -42,16 +42,16 @@ function Publish-Image([String] $JdkVersion, [String] $Flavor, [String] $TagSuff
 
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build) ) {
     if(![System.String]::IsNullOrWhiteSpace($Flavor) -and $builds[$Build].ContainsKey($Flavor)){
-        Build-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'], $builds[$Build][$Flavor]['Folder'], $builds[$Build][$Flavor]['Dockerfile'])
+        Build-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix'] $builds[$Build][$Flavor]['Folder'] $builds[$Build][$Flavor]['Dockerfile']
     } else {
         foreach($Flavor in $builds[$Build].Keys){
-            Build-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'], $builds[$Build][$Flavor]['Folder'], $builds[$Build][$Flavor]['Dockerfile'])
+            Build-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix'] $builds[$Build][$Flavor]['Folder'] $builds[$Build][$Flavor]['Dockerfile']
         }
     }
 } else {
     foreach($Build in $builds.Keys) {
-        foreach($Flavor in $Build.Keys) {
-            Build-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'], $builds[$Build][$Flavor]['Folder'], $builds[$Build][$Flavor]['Dockerfile'])
+        foreach($Flavor in $builds[$Build].Keys) {
+            Build-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix'] $builds[$Build][$Flavor]['Folder'] $builds[$Build][$Flavor]['Dockerfile']
         }
     }
 }
@@ -63,16 +63,16 @@ if($lastExitCode -ne 0) {
 if($target -eq "publish") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         if(![System.String]::IsNullOrWhiteSpace($Flavor) -and $builds[$Build].ContainsKey($Flavor)) {
-            Publish-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'])
+            Publish-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix']
         } else {
             foreach($Flavor in $builds[$Build].Keys){
-                Publish-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'])
+                Publish-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix']
             }
         }
     } else {
         foreach($Build in $builds.Keys) {
-            foreach($Flavor in $Build.Keys) {
-                Build-Image($Build, $Flavor, $builds[$Build][$Flavor]['TagSuffix'])
+            foreach($Flavor in $builds[$Build].Keys) {
+                Build-Image $Build $Flavor $builds[$Build][$Flavor]['TagSuffix']
             }
         }
     }
