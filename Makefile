@@ -8,13 +8,22 @@ IMAGE_NAME:=jenkins4eval/jnlp-slave
 build: build-alpine build-debian build-jdk11
 
 build-alpine:
-	docker build -t ${IMAGE_NAME}:alpine -f 8/alpine3.6/Dockerfile 8/
+	docker build -t ${IMAGE_NAME}:alpine \
+                 -t ${IMAGE_NAME}:alpine3.9 \
+                 -f 8/alpine3.9/Dockerfile \
+                 8/
 
 build-debian:
-	docker build -t ${IMAGE_NAME}:latest -f 8/stretch/Dockerfile   8/
+	docker build -t ${IMAGE_NAME}:latest \
+                 -t ${IMAGE_NAME}:stretch \
+                 -f 8/stretch/Dockerfile \
+                 8/
 
 build-jdk11:
-	docker build -t ${IMAGE_NAME}:jdk11  -f 11/stretch/Dockerfile 11/
+	docker build -t ${IMAGE_NAME}:jdk11 \
+                 -t ${IMAGE_NAME}:jdk11-stretch \
+                 -f 11/stretch/Dockerfile \
+                 11/
 
 
 bats:
@@ -26,7 +35,7 @@ bats:
 test: test-alpine test-debian test-jdk11
 
 test-alpine: bats
-	@FOLDER="8/alpine3.6" bats-core/bin/bats tests/tests.bats
+	@FOLDER="8/alpine3.9" bats-core/bin/bats tests/tests.bats
 
 test-debian: bats
 	@FOLDER="8/stretch"   bats-core/bin/bats tests/tests.bats
